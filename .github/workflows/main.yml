@@ -5,6 +5,10 @@ on:
     branches:
       - "master"
 
+env:
+  TEST_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/cardgameapp:test
+  LATEST_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/cardgameapp:latest
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,10 +26,23 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       -
+        name: Build and export to Docker
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          load: true
+          tags: ${{ env.TEST_TAG }}
+      -
+        name: Test
+        run: |
+          docker run --rm ${{ env.TEST_TAG }}
+      -
         name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cardgameapp:latest
+          tags: ${{ env.LATEST_TAG }}
+    test:
+    
