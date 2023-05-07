@@ -2,25 +2,25 @@
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 as build-env
 WORKDIR /src
-COPY src/*.csproj .
-RUN dotnet restore
+COPY src/cardGameApp.csproj ./src/cardGameApp.csproj
 COPY src .
-
-#build app
-RUN dotnet build -c release --no-restore
-
-# test stage -- exposes optional entrypoint
-# target entrypoint with: docker build --target test
-FROM build AS test
 WORKDIR /tests
-COPY tests/ .
-ENTRYPOINT ["dotnet", "test", "--logger:trx"]
+COPY tests/cardGameApp.Tests.csproj ./tests/cardGameApp.Tests.csproj
+COPY tests .
+RUN dotnet restore
 
-FROM build AS publish
-RUN dotnet publish -c Release -o /publish
+#Copy everything else
+COPY . ./
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 as runtime
+#Run tests and publish
+FROM build-env as test
+CMD ["dotnet","test","tests"]
+
+#RUN dotnet test tests -c Release
+RUN dotnet publish src -c Release -o /publish
+
+FROM test as runtime
 WORKDIR /publish
-COPY --from=build-env /publish .
+COPY --from=test /publish .
 EXPOSE 80
 ENTRYPOINT ["dotnet", "cardGameApp.dll"]

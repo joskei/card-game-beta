@@ -1,0 +1,7 @@
+C:\app\out\cardGameApp.exe
+C:\app\out\appsettings.Development.json
+C:\app\out\appsettings.json
+C:\app\out\cardGameApp.dll
+C:\app\out\cardGameApp.deps.json
+C:\app\out\cardGameApp.runtimeconfig.json
+C:\app\out\cardGameApp.pdb
